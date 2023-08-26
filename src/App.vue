@@ -7,6 +7,7 @@ import { RouterLink, RouterView } from 'vue-router'
       <nav>
         <RouterLink to="/">Bosh sahifa</RouterLink>
         <RouterLink to="/category">Turkumlar</RouterLink>
+        <RouterLink to="/param">Xususiyatlar</RouterLink>
       </nav>
       <div class="main">
         <RouterView />

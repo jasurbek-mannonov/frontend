@@ -13,6 +13,11 @@ const router = createRouter({
       path: '/category',
       name: 'category',
       component: () => import('../views/category.vue')
+    },
+    {
+      path: '/param',
+      name: 'param',
+      component: () => import('../views/param.vue')
     }
   ]
 })

@@ -7,7 +7,7 @@ export interface Category{
 export interface Params{
     id: number,
     title: string,
-    category: string,
+    category: number | undefined,
     status: boolean
 }
 
@@ -16,7 +16,7 @@ export interface Product{
     title: string,
     price: number,
     quantity: number,
-    category: string,
+    category: number,
     params: Params[],
     description?: string,
     createdAt: Date,
