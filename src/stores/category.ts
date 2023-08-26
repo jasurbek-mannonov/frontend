@@ -11,10 +11,7 @@ export const categoryStore = defineStore('categories', () => {
       const result = await http.post('/category', payload)
       if(result.status == 201){
         categories.value = [result.data, ...categories.value]
-        ElMessage({
-          message: 'Yangi turkum qo\'shildi',
-          type: 'success'
-        })
+        ElMessage.success("Yangi turkum muvaffaqiyatli qo'shildi")
       }
     }
     
