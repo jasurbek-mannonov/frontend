@@ -1,9 +1,15 @@
 <script lang="ts" setup>
 import  {type Category} from '@/models/type'
 import { paramStore } from '@/stores/param'
-import { storeToRefs } from 'pinia'
 import {categoryStore} from '@/stores/category'
+import { ElMessageBox } from 'element-plus'
+import { storeToRefs } from 'pinia'
 const store = paramStore()
+
+const emit = defineEmits(['edit'])
+const editParam = (id: number) => {
+  emit('edit', id)
+}
 
 const { remove_param, toggle_param_status } = store
 const { params } = storeToRefs(store)
@@ -11,6 +17,20 @@ const { params } = storeToRefs(store)
 const catStore = categoryStore()
 
 const {categories} = storeToRefs(catStore)
+
+const removeParam = (id: number) => {
+  ElMessageBox.confirm(
+    "O'chirishga ishonchingiz komilmi?",
+    "Diqqat!",
+    {
+      confirmButtonText: "Ha",
+      cancelButtonText: "Yo'q",
+      type: 'warning'
+    }
+  ).then(() => {
+    remove_param(id)
+  }).catch(() => {})
+}
 
 const getCategory = (id: number): string => {
     let res = categories.value.find((category: Category) => category.id === id)
@@ -27,7 +47,7 @@ const getCategory = (id: number): string => {
       <el-table-column label="Turkum">
         <template #default="list">
           <div>
-            {{ getCategory(list.row.id) }}
+            {{ getCategory(list.row.category) }}
           </div>
         </template>
       </el-table-column>
@@ -38,26 +58,42 @@ const getCategory = (id: number): string => {
               @click="toggle_param_status(scope.row)"
               :type="scope.row.status ? 'success' : 'danger'"
             >
-              {{ scope.row.status ? 'faol' : 'nofaol' }}
+              <el-icon>
+                <check v-if="scope.row.status"/>
+                <close v-else/>
+              </el-icon>
             </el-button>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="Amallar">
-        <template #default="scope">
-          <el-popconfirm
-            width="190"
-            title="Qaroringiz qat'iymi?"
-            confirm-button-text="ha"
-            cancel-button-text="yo'q"
-            @confirm="remove_param(scope.row.id)"
-          >
-            <template #reference>
-              <el-button icon="delete"></el-button>
+        <template #default="list">
+          <el-dropdown>
+            <el-button class="el-dropdown-link">
+              <el-icon>
+                <more />
+              </el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="editParam(list.row.id)">
+                      <el-icon>
+                        <edit/>
+                      </el-icon>
+                      tahrirlash
+                </el-dropdown-item>
+                <el-dropdown-item @click="removeParam(list.row.id)">
+                      <el-icon>
+                        <delete/>
+                      </el-icon>
+                      o'chirish
+                </el-dropdown-item>
+              </el-dropdown-menu>
             </template>
-          </el-popconfirm>
+          </el-dropdown>
         </template>
       </el-table-column>
+    
     </el-table>
   </div>
 </template>

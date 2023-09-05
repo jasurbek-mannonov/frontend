@@ -34,7 +34,16 @@ export const categoryStore = defineStore('categories', () => {
 
   const toggle_category_status = async (category: Category): Promise<void> => {
     category.status = !category.status
+    save_category(category)
+  }
     
+
+
+  const get_category = async(id: number) => {
+    return http.get(`category/${id}`)
+  }
+
+  const save_category = async(category: Category): Promise<void> => {
     let result = await http.put(`/category/${category.id}`, category)
     if(result.status == 200){
       categories.value = categories.value.map((cat: Category) => {
@@ -51,5 +60,7 @@ export const categoryStore = defineStore('categories', () => {
     add_category,
     remove_category,
     toggle_category_status,
+    get_category,
+    save_category
   }
 })

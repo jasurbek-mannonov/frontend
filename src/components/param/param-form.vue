@@ -1,50 +1,74 @@
 <script lang="ts" setup>
-import { FormInstance, FormRules } from 'element-plus'
 import type { Param, Category } from '@/models/types'
-import { computed, ref } from 'vue'
-import { paramStore } from '@/stores/param'
-import { categoryStore } from '@/stores/category'
+import { FormInstance, FormRules } from 'element-plus'
+import { computed, ref, watch } from 'vue'
 
+import { paramStore } from '@/stores/param'
 const store = paramStore()
+const { add_param, get_param, save_param } = store
+
+import {categoryStore} from '@/stores/category'
 const catStore = categoryStore()
 
-const { add_param } = store
-
-const param = ref<Param>({
-  title: '',
-  status: true,
-  category: undefined
-})
-
-const catList = computed(() => catStore.categories.filter((category: Category) => category.status))
+const catList = computed(() => catStore.categories.filter((category: Category) => {
+  category.status
+}))
 
 const paramForm = ref<FormInstance>()
 
+const param = ref<Param>({
+  title: '',
+  category: '',
+  status: true
+})
+
+const toggle = ref<boolean>(false)
+
 const ruleForm = ref({
   title: '',
-  category: ''
+  status: false
 })
 
 const rules = ref<FormRules<typeof ruleForm>>({
-  title: [{ message: 'Turkum nomini kiriting', required: 'true' }],
-  category: [{ message: 'Turkum xususiyatini belgilang', required: 'true' }]
+  title: [{ message: 'Turkum nomini kiriting', required: true }],
+  category: [{ message: 'Xususiyat turkumini belgilang', required: true }]
 })
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      add_param(param.value)
+      if (toggle.value) {
+        save_param(param.value)
+        emit('edit',0)
+      } else {
+        add_param(param.value)
+      }
       param.value = {
         title: '',
         status: true,
-        category: undefined
+        category: ''
       }
+      toggle.value = false
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+watch(
+  () => props.id,
+  async (val: number) => {
+    if(val === 0) return;
+    let result = await get_param(val)
+    if (result.status === 200) {
+      param.value = { ...result.data }
+      toggle.value = true
+    }
+  }
+)
+
+const props = defineProps(['id'])
+const emit = defineEmits(['edit'])
 </script>
 
 <template>
@@ -62,9 +86,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       <el-form-item label="Xususiyat nomi" prop="title">
         <el-input v-model="param.title" />
       </el-form-item>
-      <el-form-item label="Turkum" prop="category">
+      <el-form-item label="Turkum" prop="param">
         <el-select 
-          v-model="param.category" 
+          v-model="param.param" 
           placeholder="Ro'yxatdan tanlang"
           filterable 
           clearable
